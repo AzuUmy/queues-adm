@@ -1,0 +1,103 @@
+.creatUsserForms{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+
+.creatUsserForms div h1 {
+    margin-bottom: 1em;
+}
+.componenetOn{
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.componeentCreat{
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.guicheDropDown{
+    position: relative;  
+}
+
+
+
+.dropDownContent{
+    position: absolute;
+    background-color: rgb(241, 241, 241);
+    padding: 0.1em 1em 1em 1em;
+    text-align: center;
+    color: rgb(151, 151, 151);
+    font-size: 20px;
+    margin-top: 5px;
+    width: 296px;
+}
+
+.guicheEle{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: none;
+    padding: 0 0.5em;
+    transition: 300ms ease-in-out;
+}
+.guicheEle p {
+    margin-bottom: 1em;
+}
+
+.dropDownContent hr {
+    margin: 5px -5px;
+    width: 295px;
+    margin-left: 1px;
+   background-color: black;
+}
+
+.guicheEle:hover{
+    background-color: rgb(0, 162, 255);
+    cursor: pointer;
+color: rgb(255, 255, 255);
+}
+
+.componenetOn div h1 {
+    font-size: 30px;
+    text-align: center;
+}
+
+ input {
+    width: 300px;
+    padding: 1em;
+    background-color: rgb(245, 245, 245);
+    outline-color: rgb(40, 169, 255);
+    border: none;
+    font-size: 18px;
+    color: rgb(92, 92, 92);
+}
+
+ p {
+    font-size:20px;
+    margin: 1em 0 0 0;
+}
+
+button {
+    margin-top: 1em;
+    padding: 1em;
+    font-size: 20px;
+    background-color: rgb(237, 237, 237);
+    border: none;
+    width: 100%;
+    color: rgb(88, 88, 88);
+    transition: 350ms ease-in-out;
+}
+
+button:hover {
+    cursor: pointer;
+    background-color: rgb(0, 162, 255);
+    color: rgb(255, 255, 255);
+}

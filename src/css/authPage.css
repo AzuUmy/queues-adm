@@ -1,0 +1,26 @@
+.init-component{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2em;
+}
+
+.init-component div button {
+    width: 300px;
+    height: 50px;
+    font-size: 1.2em;
+}
+
+.loginContent {
+    display: flex;
+    align-items: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.loginContent div div {
+    display: flex;
+    flex-direction: column;
+}
