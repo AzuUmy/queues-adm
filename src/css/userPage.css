@@ -4,9 +4,9 @@
     left: 50%;
     transform: translate(-50%, -50%);
     display: flex;
-    gap: 10em;
+    align-items: center;
+    gap: 5em;
 }   
-
 
 .componenetInfo{
     display: flex;
@@ -27,6 +27,17 @@
     margin: -30px;
 }
 
+
+.comOnA{
+    margin-top: 62em;
+}
+
+
+.call-elementOn{
+    position: fixed;
+    top: -175px;
+}
+
 .currenAtCall{
     display: flex;
     align-items: center;
@@ -38,123 +49,109 @@
     margin: 0;
 }
 
-.callCo{
-    width: 735px;
-    height: 150px;
-    background-color: rgb(240, 240, 240);
+.callComponenet{
+    height: 160px;
+    width: 700px;
+    background-color: rgb(238, 238, 238);
 }
 
-.CallComE{
+.onCallingComponenets{
     display: flex;
     align-items: center;
     gap: 1em;
 }
 
-.ActionButton{
-    display: flex;
-    flex-direction: column;
-    gap: 0.5em;
-    align-items: center;
-}
-.ActionButton button {
-    padding: 0.6em;
+.onCallingComponenets button {
     margin: 0;
+    height: 80px;
 }
 
-.Button1 {
+.callinCurrent{
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    text-align: center;
+    height: 160px;
     background-color: red;
-    color: white;
-    transition: 400ms ease-in-out;
+    width: 935px;
 }
 
-.Button1:hover{
-    background-color: rgb(172, 0, 0);
+.calling {
+    height:160px;
+    width: 700px;
+    background-color: red;
 }
 
-.Button2{
-    background-color: orange;
-    color: white;
-    transition: 400ms ease-in-out;
-}
-
-.Button2:hover{
-    background-color: rgb(190, 124, 0);
-}
-
-.CompoenentQueuesLine{
-    position: fixed;
-    top: 40%;
-    left: 50%;
+.queuesON{
+    height: 800px;
+    width: 940px;
+    top: 60%;
+    left: 55%;
     transform: translate(-50%, -50%);
-    margin-left:  14.2em;
-    margin-top: 10em;
 }
 
-.QueuesElement{
+
+
+
+.queuesInLineContent{
     display: flex;
     align-items: center;
     justify-content: space-between;
-
-}
-
-.QueuesElement h2 {
-    margin: 0;
-    font-size: 5em;
-    display: flex;
-    align-items: center;
-    gap: 1em;
-
-}
-
-.QueuesElement p {
-    margin: 0;
-    font-size: 30px;
-    font-weight: bold;
-}
-
-.queueNumber{
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    width: 640px;
+    padding:  0 3em;
     background-color: rgb(232, 232, 232);
-    padding: 1em;
-    gap: 8em;
+    color: rgb(0, 0, 0);
+    height: 200px;
+    width: 680px;
+    
+    margin-bottom: 1em;
 }
 
-.callAction{
-    height: 150px;
-    width: 202px;
-    margin: 0;
-    background-color: rgb(0, 255, 68);
-    font-size:25px;
+.queuesInLineContent h1{
+    font-size: 200px;
+    margin-bottom: 1em;
+}
+
+.queuesInLineContent h2 {
+    font-size: 50px;
+}
+
+.queuesContent{
+    display: flex;
+    align-items: center;
+}
+
+.overContet{
+    overflow: auto;
+    height: 900px;
+}
+
+.overContet::-webkit-scrollbar {
+    width: 10px;
+}
+.overContet::-webkit-scrollbar-track {
+    background: rgb(255, 255, 255);
+}
+
+.overContet::-webkit-scrollbar-thumb {
+    background: rgb(227, 227, 227);
+}
+.ButtonsInteraction{
+    margin-right: 1.2em;
+}
+
+.ButtonsInteraction button {
+   margin-top: 6px;
+   margin-bottom: 0.9em;
+    height: 201px;
+    background-color: rgb(231, 231, 231);
+    font-size: 25px;
+    color: rgb(3, 3, 3);
+    margin-left: 0.5em;
+}
+
+.ButtonsInteraction button:hover{
+    cursor: pointer;
+    background-color: rgb(0, 162, 255);
     color: white;
 }
 
-.QueEdcd{
-    display: flex;
-    align-items: center;
-    gap: 1em;
-    margin-bottom: 0.5em;
-}
-
-.queuesLine{
-    height: 100%;
-}
-
-.queuesLine {
-    overflow: auto;
-    height: 800px;
-}
-
-.queuesLine::-webkit-scrollbar {
-    width: 10px; 
-}
-
-.queuesLine::-webkit-scrollbar-track {
-    background: none;
-}
-
-.queuesLine::-webkit-scrollbar-thumb {
-    background-color: #dedede; 
-}

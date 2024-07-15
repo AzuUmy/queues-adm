@@ -4,9 +4,9 @@
             <div>
                 <div>
                     <p>Email/Matricula</p>
-                    <input v-model="email" type="text">
+                    <input v-model="email" type="email">
                     <p>Senha</p>
-                    <input v-model="senha" type="text">
+                    <input v-model="senha" type="password">
                 </div>
                 <div>
                     <div>
