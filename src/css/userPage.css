@@ -28,9 +28,12 @@
 }
 
 
+
+
 .comOnA{
     margin-top: 62em;
 }
+
 
 
 .call-elementOn{
@@ -72,15 +75,58 @@
     gap: 1em;
     text-align: center;
     height: 160px;
-    background-color: red;
     width: 935px;
 }
+
+.contentHandlerDiv{
+    display: flex;
+    width: 300px;
+}
+
+
+.calling-componenet{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: -3em 2em;
+}
+
+.calling-componenet h1 {
+    color: black;
+    font-size:80px;
+}
+
+.calling-componenet h2{
+    font-size: 40px;
+    color: rgb(149, 149, 149);
+}
+
+.calling-componenet button {
+    margin: 0;
+}
+
+
 
 .calling {
     height:160px;
     width: 700px;
-    background-color: red;
+    background-color: rgb(237, 237, 237);
 }
+
+
+
+.Timer{
+    height: 160px;
+    width: 220px;
+    background-color: rgb(0, 119, 255);
+    color: rgb(255, 255, 255);
+}
+
+.Timer h1 {
+    font-size: 100px;
+    margin: 0px 0px;
+}
+
 
 .queuesON{
     height: 800px;
@@ -146,7 +192,7 @@
     background-color: rgb(231, 231, 231);
     font-size: 25px;
     color: rgb(3, 3, 3);
-    margin-left: 0.5em;
+    margin-left: 0.4em;
 }
 
 .ButtonsInteraction button:hover{

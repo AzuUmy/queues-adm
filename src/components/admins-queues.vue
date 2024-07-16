@@ -24,27 +24,30 @@
                         <h1>Atendimento</h1>
                         <div>
                             <div class="onCallingComponenets">
-                                <div class="callComponenet">
-                                    
-                                </div>
-                                <div class="buttonTets">
+                                    <div class="callComponenet">
+                                        
+                                    </div>
+                                    <div class="buttonTets">
                                     <button>Encerrar</button>
                                     <button>Pausar</button>
                                 </div>
                             </div>
 
-                                <div class="elementOfOngoing">
+                                <div class="elementOfOngoing" v-if="callingOn">
                                         <h1>Chamando</h1>
                                         <div class="callinCurrent">
                                                 <div class="calling">
-                                                    <div v-for="(called, index) in calledSenha" :key="index">
-                                                        <h1>{{ called.senha }}</h1>
-                                                        <h2>{{ called.info }}</h2>
+                                                    <div v-for="(called, index) in calledSenha" :key="index" class="calling-componenet">
+                                                        <h2>Senha</h2>
+                                                        <h1 class="NumberInSenha">{{ called.senha }}</h1>
+                                                        <h2>tipo</h2>
+                                                        <h1>{{ called.info }}</h1>
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <div class="Timer">
-                                                        1
+                                                    <div class="Timer" :style="{background: handleTimerdisplayInfo}">
+                                                        <h1>{{ callingTimer }}</h1>
+                                                        <button v-if="callNoAnswerd" @click="cancelCalling">Cancelar</button>
                                                     </div>
                                                 </div>
                                         </div>   
@@ -101,7 +104,12 @@ export default {
             
             loggedUser: true,
             noCallOngoing: true,
-            calledSenha: []
+            calledSenha: [],
+            callingTimer: 10,
+            handleTimerdisplayInfo: '',
+            callingOn: false,
+            callNoAnswerd: false,
+            defaultCallingTime: 10
         }
     },
 
@@ -166,10 +174,8 @@ export default {
             setTimeout(() => {
                 this.deleteCallingFromQueue(senha);
                 this.getCalledSenha();
+                this.setRunningCallingTime();
             },100);
-          
-       
-
         },
 
         async getQueuesON(){
@@ -218,7 +224,7 @@ export default {
                 });
 
                 this.calledSenha = response.data.data;
-
+                this.featchUserOnCalling();
             } catch (error) {
                 console.log('error', error);
             }
@@ -228,15 +234,70 @@ export default {
             let atendente = this.userInfo.nome;
             let guiche = this.userInfo.guiche;
             await this.getCalledSenha(atendente, guiche);
+           
+        },
 
+        setRunningCallingTime(){
+         this.handleCallingON();
+            this.interval = setInterval(() => {
+                if(this.callingTimer > 0){
+                    this.callingTimer --;
+
+                    if(this.callingTimer < 30){
+                       this.handleTimerdisplayInfo = 'orange';
+                    } 
+                    if( this.callingTimer < 15) {
+                        this.handleTimerdisplayInfo = 'red';
+                    }
+                    
+                    if(this.callingTimer <= 0){
+                        this.callNoAnswerd = true;
+                        this.beforeDestroy();
+                    }
+                }else{
+                    clearInterval(this.interval);
+                }    
+            }, 1000); 
+        },
+
+        beforeDestroy() {
+            clearInterval(this.interval);
+        },
+
+        handleCallingON(){
+            if(this.calledSenha != null){
+                this.callingOn = true;
+            } else{
+                this.callingOn = false
+            }
+        },
+
+         cancelCalling(){
+            let senha = this.calledSenha[0].senha;
+            let guiche = this.userInfo.guiche;
+            let atendente = this.userInfo.nome;
+            this.cancelByInfo(senha, guiche, atendente);
+        },
+
+      async  cancelByInfo(senha, guiche, atendente){
+                try {
+                    const response = await axios.delete(`http://localhost:8080/deleteCall/${senha}/${guiche}/${atendente}`);
+                    this.calledSenha.splice(0 , 1);
+                    this.callingOn = false;
+                    this.callNoAnswerd = false;
+                    this.callingTimer = this.defaultCallingTime;
+                } catch (error) {
+                    console.error('error deleting senha', error);
+                }
         }
     },
+
+    
 
     mounted() {
        this.loadUserInfo();
        this.connectWebSocket();
        this.getQueuesON();
-      // this.getCalledSenha();
        this.featchUserOnCalling();
     }
 }
