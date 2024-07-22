@@ -105,11 +105,11 @@ export default {
             loggedUser: true,
             noCallOngoing: true,
             calledSenha: [],
-            callingTimer: 10,
+            callingTimer: 60,
             handleTimerdisplayInfo: '',
             callingOn: false,
             callNoAnswerd: false,
-            defaultCallingTime: 10
+            defaultCallingTime: 60
         }
     },
 
@@ -127,13 +127,12 @@ export default {
                     this.senhas.push(data.data);
                 }
 
-                if(data.status == 'success' && data.type === 'Delete'){
+                if(data.status === 'success' && data.type === 'Delete'){
                     const deletedSenha = data.data;
                     this.senhas = this.senhas.filter(senha => senha._id !== deletedSenha._id);
                 } 
 
-                if(data.status === 'success' && data.type === 'Call'){
-                    
+                if(data.status === 'success' && data.type === 'Call'){  
                     this.calledSenha.push(data.data);
                     this.getCalledSenha();
                 }
@@ -171,11 +170,11 @@ export default {
             let info = this.senhas[index].info;
 
             this.getCurrentCalling(user, guiche, senha, info);
-            setTimeout(() => {
-                this.deleteCallingFromQueue(senha);
-                this.getCalledSenha();
-                this.setRunningCallingTime();
-            },100);
+                setTimeout(() => {
+                    this.deleteCallingFromQueue(senha);
+                    this.getCalledSenha();
+                    this.setRunningCallingTime();
+                },100);
         },
 
         async getQueuesON(){
@@ -218,9 +217,9 @@ export default {
             try{
                 const response = await axios.get('http://localhost:8080/calling', {
                     params: {
-                    atendente: atendente,
-                    guiche: guiche
-            }
+                        atendente: atendente,
+                        guiche: guiche
+                    }
                 });
 
                 this.calledSenha = response.data.data;
@@ -242,6 +241,7 @@ export default {
             this.interval = setInterval(() => {
                 if(this.callingTimer > 0){
                     this.callingTimer --;
+                    this.handleTimerdisplayInfo = 'rgb(0, 119, 255)';
 
                     if(this.callingTimer < 30){
                        this.handleTimerdisplayInfo = 'orange';

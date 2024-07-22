@@ -64,7 +64,6 @@ export default {
             try {
                 const response = await axios.get('http://localhost:8080/loginUser');
                 this.users = response.data.us;
-                console.log("Users data:", this.users);
                 let userFound = false;
                 this.users.forEach(user => {
                         if (this.email === user.email && this.senha === user.senha) {
@@ -78,7 +77,8 @@ export default {
 
                             this.loading = true;
                             if(getToken()){
-                                setTimeout(() => {    
+                                setTimeout(() => {
+                                    this.setUserStatus(getToken().guiche, getToken().nome);
                                     const router = this.$router;
                                     router.push('/home');
                                 }, 2000);
@@ -95,6 +95,18 @@ export default {
                 console.log("error", err);
             }
         },
+
+        async setUserStatus(guiche, atendente){
+                try {
+                const response = await axios.post('http://localhost:8080/userStatus', {
+                        guiche: guiche,
+                        atendente: atendente,
+                        status: 'Online' 
+                    });
+                    } catch (error){
+                    console.error('Error writing data', error);
+                    }
+        }
     },
 }
 </script>
