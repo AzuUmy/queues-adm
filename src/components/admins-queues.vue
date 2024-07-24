@@ -24,9 +24,7 @@
                         <h1>Atendimento</h1>
                         <div>
                             <div class="onCallingComponenets">
-                                    <div class="callComponenet">
-                                        
-                                    </div>
+                                    <div class="callComponenet"></div>
                                     <div class="buttonTets">
                                     <button>Encerrar</button>
                                     <button>Pausar</button>
@@ -58,13 +56,13 @@
                                     <h1>Senhas na fila</h1>
                                         <div class="overContet">
                                             <div v-for="(senha, index) in senhas" :key="index" class="queuesContent">
-                                            <div class="queuesInLineContent">
+                                            <div class="queuesInLineContent"  :style="{backgroundColor: senhaTypeInfo[senha._id], color: colorInType[senha._id]}">
                                                 <h2>Senha</h2>
                                                 <h1>{{ senha.senha }}</h1>
                                             </div>
 
                                             <div class="ButtonsInteraction">
-                                                <button @click="callPass(index)">Chamar</button>
+                                                <button v-if="displayButom[index]" @click="callPass(index)">Chamar</button>
                                             </div>
                                                 
                                             </div>
@@ -101,7 +99,8 @@ export default {
                 nome: '',
                 guiche: ''
             },
-            
+            senhaTypeInfo: {},
+            colorInType: {},
             loggedUser: true,
             noCallOngoing: true,
             calledSenha: [],
@@ -109,7 +108,18 @@ export default {
             handleTimerdisplayInfo: '',
             callingOn: false,
             callNoAnswerd: false,
-            defaultCallingTime: 60
+            defaultCallingTime: 60,
+            displayButom: [false]
+        }
+    },
+
+
+    watch: {
+        senhas: {
+            immediate: true,
+            handler(){
+                this.getQueuesON();
+            }
         }
     },
 
@@ -127,10 +137,21 @@ export default {
                     this.senhas.push(data.data);
                 }
 
-                if(data.status === 'success' && data.type === 'Delete'){
-                    const deletedSenha = data.data;
-                    this.senhas = this.senhas.filter(senha => senha._id !== deletedSenha._id);
+                if(data.status === 'success' && data.type === 'Preferencial'){
+                    this.senhas.push(data.data);
+                }
+
+                if(data.status === 'success' && data.type === 'DeleteRegular'){
+                    const deleteRegular = data.data;
+                    console.log(deleteRegular);
+                    this.senhas = this.senhas.filter(senha => senha._id !== deleteRegular._id);
                 } 
+
+                if(data.status === 'success' && data.type === 'DeletePref'){
+                    const deletePref = data.data;
+                    console.log(deletePref);
+                    this.senhas = this.senhas.filter(senha => senha._id !== deletePref._id);
+                }
 
                 if(data.status === 'success' && data.type === 'Call'){  
                     this.calledSenha.push(data.data);
@@ -171,17 +192,41 @@ export default {
 
             this.getCurrentCalling(user, guiche, senha, info);
                 setTimeout(() => {
-                    this.deleteCallingFromQueue(senha);
+                    this.deleteCallingFromQueue(senha, info);
                     this.getCalledSenha();
                     this.setRunningCallingTime();
                 },100);
         },
 
+        
+
         async getQueuesON(){
-             
              try {
-                const response = await axios.get('http://localhost:8080/senhas');
-                this.senhas = response.data.data;
+
+                const [regularQueue, prefQueue] = await Promise.all([
+                    axios.get('http://localhost:8080/prefe'),
+                    axios.get('http://localhost:8080/senhas')
+                    
+                ]);
+
+
+                 const senhas  =  this.senhas = [...regularQueue.data.data, ...prefQueue.data.data];
+                
+                 senhas.forEach(senha => {
+                    if(senha.info === 'Preferencial'){
+                        this.senhaTypeInfo[senha._id] = 'rgb(0, 162, 255)';
+                        this.colorInType[senha._id] = 'White'
+                    }else{
+                        this.senhaTypeInfo[senha._id] = '';
+                        this.colorInType[senha._id] = ''
+                    }
+                 });
+               
+                 
+                 this.displayButom[0] = true;
+
+
+           
             } catch (error) {
                 console.error('Error fetching senhas:', error.response ? error.response.data : error.message);
             }
@@ -204,9 +249,16 @@ export default {
             }
         },
 
-        async deleteCallingFromQueue(senha){
+        async deleteCallingFromQueue(senha,info){
             try {
-                const response = await axios.delete(`http://localhost:8080/Pickedsenha/${senha}`);
+
+             if(info === 'Regular'){
+                  const response = await axios.delete(`http://localhost:8080/Pickedsenha/${senha}`);
+                } else if(info === 'Preferencial'){
+                   const  response = await axios.delete(`http://localhost:8080/pickedPrefSenha/${senha}`);
+                }                  
+
+
                 this.senhas = this.senhas.filter(item => item.senha !== senha);
             } catch(error) {
                 console.log("error deleting content")
@@ -289,6 +341,11 @@ export default {
                 } catch (error) {
                     console.error('error deleting senha', error);
                 }
+        },
+
+        customizeUserInteraction(senhas){
+            console.log('senha', senhas);
+
         }
     },
 
