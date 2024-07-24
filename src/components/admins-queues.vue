@@ -104,11 +104,11 @@ export default {
             loggedUser: true,
             noCallOngoing: true,
             calledSenha: [],
-            callingTimer: 60,
+            callingTimer: 60, //keep as 60
             handleTimerdisplayInfo: '',
             callingOn: false,
             callNoAnswerd: false,
-            defaultCallingTime: 60,
+            defaultCallingTime: 60, // keep as 60
             displayButom: [false]
         }
     },
@@ -198,7 +198,7 @@ export default {
                 },100);
         },
 
-        
+
 
         async getQueuesON(){
              try {
@@ -206,31 +206,53 @@ export default {
                 const [regularQueue, prefQueue] = await Promise.all([
                     axios.get('http://localhost:8080/prefe'),
                     axios.get('http://localhost:8080/senhas')
-                    
+
                 ]);
 
 
                  const senhas  =  this.senhas = [...regularQueue.data.data, ...prefQueue.data.data];
-                
+
+                 /* tracking content inside senhas to check button display
+                 * in this case button is displayed twice if there is preferencial senha one for the first preferencial
+                 * and one for the first regular senha, this is done by passing the trackPrefSenha to the displayButton
+                 * so the next element to display the button will be the first element outside the preference if
+                 * both of them receives the trackButton as a parameter, this variable is an array started a position 0
+                 * by passing this array into the displayButton I am updating the state (Boolean) to true for
+                 * that specific position if it meets the requirements*/
+
+                 const trackButton = [0]; // set the position of the array for [0]
+                 let trackPrefSenha = 0; // tracks the position of the preferencial senha
+
+
                  senhas.forEach(senha => {
-                    if(senha.info === 'Preferencial'){
-                        this.senhaTypeInfo[senha._id] = 'rgb(0, 162, 255)';
-                        this.colorInType[senha._id] = 'White'
-                    }else{
-                        this.senhaTypeInfo[senha._id] = '';
-                        this.colorInType[senha._id] = ''
-                    }
+                      if(senha.info === 'Preferencial'){
+                        trackPrefSenha++; // tracks how many senhas with tag info there is in the array increases the number of the variable for each
+
+                          if(trackPrefSenha > 0){
+                            this.displayButom = [trackButton]; // by passing the trackButton array it sets the display of position 0 to true
+                          }
+
+                          this.senhaTypeInfo[senha._id] = 'rgb(0, 119, 255)';
+                          this.colorInType[senha._id] = 'White'
+
+                      } else if(senha.info === 'Regular') { // checks if there is senhas with tag regular
+
+                          if(trackPrefSenha > 0){
+                            this.displayButom[trackPrefSenha] = [trackButton]; // set the displayButton to true for the position that are after the trackPrefSenha
+                          }else{
+                            this.displayButom = [trackButton]; // passes the trackButton position to displayButton so only the first element always contains a button
+                          }
+
+                      }
+                      else{
+                          this.senhaTypeInfo[senha._id] = '';
+                          this.colorInType[senha._id] = '';
+                      }
                  });
-               
-                 
-                 this.displayButom[0] = true;
 
-
-           
             } catch (error) {
                 console.error('Error fetching senhas:', error.response ? error.response.data : error.message);
             }
-            
         },
 
 
