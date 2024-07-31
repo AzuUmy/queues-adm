@@ -9,27 +9,31 @@
             <div>
                 <div class="userInfo">
                     <div>
-                        <div class="componenetInfo">
-                            <p>Guiche</p>
-                            <h2>{{ userInfo.guiche }}</h2>
-                        </div>
-                
-                        <div class="currenAtCall">
-                            <p>Atendente:</p>
-                            <h1>{{ userInfo.nome }}</h1>
-                        </div>
+                          <div class="componenetInfo">
+                              <p>Guiche</p>
+                              <h2>{{ userInfo.guiche }}</h2>
+                          </div>
+
+                          <div class="currenAtCall">
+                              <p>Atendente:</p>
+                              <h1>{{ userInfo.nome }}</h1>
+                          </div>
                      </div>
 
                      <div class="comOnA">
-                        <h1>Atendimento</h1>
+                                  <h1>Atendimento</h1>
                         <div>
-                            <div class="onCallingComponenets">
-                                    <div class="callComponenet"></div>
-                                    <div class="buttonTets">
-                                    <button>Encerrar</button>
-                                    <button>Pausar</button>
-                                </div>
-                            </div>
+                              <div class="onCallingComponenets">
+                                      <div class="callComponenet">
+                                          <div v-for="(onGoing, index) in onCall" :key="index">
+
+                                          </div>
+                                      </div>
+                                      <div class="buttonTets">
+                                      <button>Encerrar</button>
+                                      <button>Pausar</button>
+                                  </div>
+                               </div>
 
                                 <div class="elementOfOngoing" v-if="callingOn">
                                         <h1>Chamando</h1>
@@ -44,16 +48,22 @@
                                                 </div>
                                                 <div>
                                                     <div class="Timer" :style="{background: handleTimerdisplayInfo}">
-                                                        <h1>{{ callingTimer }}</h1>
+                                                      <h1>{{ callingTimer }}</h1>
+
+                                                      <div class="callInteraction">
+                                                        <button @click="intiCall" v-if="currentCallNotAnswerd" >Iniciar Atendimento</button>
                                                         <button v-if="callNoAnswerd" @click="cancelCalling">Cancelar</button>
+
+                                                      </div>
+
+
                                                     </div>
                                                 </div>
                                         </div>   
                                 </div>
 
                                 <div>
-
-                                    <h1>Senhas na fila</h1>
+                                    <h1 class="TopeCDAS">Senhas na fila</h1>
                                         <div class="overContet">
                                             <div v-for="(senha, index) in senhas" :key="index" class="queuesContent">
                                             <div class="queuesInLineContent"  :style="{backgroundColor: senhaTypeInfo[senha._id], color: colorInType[senha._id]}">
@@ -67,7 +77,6 @@
                                                 
                                             </div>
                                         </div>
-
                                 </div>
                                 
                             </div>
@@ -77,13 +86,7 @@
             </div>
     </section>
 
-    <div class="queuesON">
-           
-           
-        </div>
-    
-
-  
+    <div class="queuesON"></div>
 </template>
 
 
@@ -109,7 +112,11 @@ export default {
             callingOn: false,
             callNoAnswerd: false,
             defaultCallingTime: 60, // keep as 60
-            displayButom: [false]
+            displayButom: [false],
+            time: '',
+            currentCallNotAnswerd: true,
+            initCurrentCalling: [],
+            onCall: []
         }
     },
 
@@ -189,13 +196,22 @@ export default {
             let guiche = this.userInfo.guiche;
             let senha = this.senhas[index].senha;
             let info = this.senhas[index].info;
+            this.updateTime();
+            let calledTime = this.time;
 
-            this.getCurrentCalling(user, guiche, senha, info);
+            this.getCurrentCalling(user, guiche, senha, info, calledTime);
                 setTimeout(() => {
                     this.deleteCallingFromQueue(senha, info);
+                    this.initCurrentCalling = [guiche, user, senha, info];
                     this.getCalledSenha();
                     this.setRunningCallingTime();
                 },100);
+        },
+
+
+        updateTime(){
+            const now = new Date();
+                this.time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         },
 
 
@@ -257,13 +273,14 @@ export default {
 
 
 
-        async getCurrentCalling(user, guiche, senha, info){
+        async getCurrentCalling(user, guiche, senha, info, time){
             try {
                 const response = await axios.post('http://localhost:8080/calling',{
                     guiche: guiche,
                     senha: senha,
                     info: info,
                     atendente: user,
+                    callStart: time
                 });
                 
             } catch (error) {
@@ -325,6 +342,7 @@ export default {
                     }
                     
                     if(this.callingTimer <= 0){
+                        this.currentCallNotAnswerd = false;
                         this.callNoAnswerd = true;
                         this.beforeDestroy();
                     }
@@ -365,10 +383,44 @@ export default {
                 }
         },
 
-        customizeUserInteraction(senhas){
-            console.log('senha', senhas);
+        intiCall() {
+                  let guiche = this.initCurrentCalling[0];
+                  let atendente = this.initCurrentCalling[1];
+                  let senha = this.initCurrentCalling[2];
+                  let info = this.initCurrentCalling[3];
+                  this.updateTime();
+                  let calledTime = this.time;
 
-        }
+                  console.log(calledTime, guiche, atendente, senha, info);
+
+                  this.initOnGoingCall(guiche, senha, info, atendente, calledTime);
+                  setTimeout(() => {
+                     this.cancelByInfo(senha, guiche, atendente);
+                  }, 100)
+
+
+                  this.currentCallNotAnswerd = true;
+                  this.callingTimer = this.defaultCallingTime;
+                  this.beforeDestroy();
+        },
+
+
+      async initOnGoingCall(guiche, senha, info, atendente, callStart){
+          try {
+            const response = await axios.post('http://localhost:8080/initCall', {
+              guiche: guiche,
+              senha: senha,
+              info: info,
+              atendente: atendente,
+              callStart: callStart
+
+
+            })
+          } catch (err) {
+            console.error(err);
+          }
+      }
+
     },
 
     

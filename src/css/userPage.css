@@ -27,9 +27,6 @@
     margin: -30px;
 }
 
-
-
-
 .comOnA{
     margin-top: 62em;
 }
@@ -203,3 +200,11 @@
     color: white;
 }
 
+.TopeCDAS  {
+    margin-top: 2em;
+}
+
+.callInteraction{
+    display: flex;
+    align-items: center;
+}
