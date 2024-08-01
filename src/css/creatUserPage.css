@@ -44,7 +44,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin: none;
+    margin: 0;
     padding: 0 0.5em;
     transition: 300ms ease-in-out;
 }

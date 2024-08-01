@@ -14,7 +14,20 @@
                        <div class="componenetInfo" :style="{width: commponenetTimerWidth + 'px'}">
                          <p>{{ Guiche }}</p>
                          <h2 v-if="calledInit === true">{{ userInfo.guiche }}</h2>
-                         <h2 v-if="initTimerForCall">{{ formattedTime }}</h2>
+                          <div>
+                                <template v-if="loading">
+                                  <div class="loadingCounter">
+                                    <div>
+                                      <spiner  :style="{width: 70 + 'px', height: 70 + 'px',  borderWidth: '10px',  borderColor: '#00ff22', borderTopColor: '#ffffff'  }"  :loading="loading" />
+                                    </div>
+                                  </div>
+
+
+                                </template>
+                                <template v-else>
+                                  <h2 v-if="initTimerForCall">{{ formattedTime }}</h2>
+                                </template>
+                          </div>
                        </div>
 
                        <div class="currenAtCall">
@@ -99,8 +112,15 @@
 <script>
 import {getToken} from '../auth/authPass';
 import axios from 'axios';
+import spiner from "../assets/animation/spinningWheel.vue";
 
 export default {
+
+  components: {
+    spiner
+
+  },
+
     data() {
         return{
             Guiche: 'Guiche',
@@ -128,17 +148,18 @@ export default {
             formattedTime: '00:00',
             initTimerForCall: false,
             calledInit: true,
-           commponenetTimerWidth: 250
+            commponenetTimerWidth: 250,
+            loading: false
         }
     },
 
     watch: {
-        senhas: {
+       senhas: {
             immediate: true,
-            handler(){
+           handler(){
                 this.getQueuesON();
             }
-        }
+       }
     },
 
 
@@ -377,9 +398,11 @@ export default {
         },
 
          cancelCalling(){
-            let senha = this.calledSenha[0].senha;
-            let guiche = this.userInfo.guiche;
-            let atendente = this.userInfo.nome;
+              let senha = this.calledSenha[0].senha;
+              let guiche = this.userInfo.guiche;
+              let atendente = this.userInfo.nome;
+              this.currentCallNotAnswerd = true;
+              this.handleTimerdisplayInfo = 'rgb(0, 119, 255)';
             this.cancelByInfo(senha, guiche, atendente);
         },
 
@@ -390,6 +413,7 @@ export default {
                     this.callingOn = false;
                     this.callNoAnswerd = false;
                     this.callingTimer = this.defaultCallingTime;
+
                 } catch (error) {
                     console.error('error deleting senha', error);
                 }
@@ -405,8 +429,10 @@ export default {
 
                   this.initOnGoingCall(guiche, senha, info, atendente, calledTime);
                   setTimeout(() => {
-                     this.cancelByInfo(senha, guiche, atendente);
-                     this.getCurrentCall(atendente, senha, guiche);
+                        this.cancelByInfo(senha, guiche, atendente);
+                        this.getCurrentCall(atendente, senha, guiche);
+                        this.initTimerForCall = false;
+                        this.calledInit = true;
                   }, 100)
 
 
@@ -453,7 +479,9 @@ export default {
       },
 
       startCountingOnGoingCall(){
+             this.loading = true;
           this.interval = setInterval(() => {
+              this.loading = false;
               this.passedTime++;
               this.updateFormattedTime();
               this.initTimerForCall = true;
