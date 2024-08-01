@@ -8,33 +8,39 @@
 
             <div>
                 <div class="userInfo">
-                    <div>
-                          <div class="componenetInfo">
-                              <p>Guiche</p>
-                              <h2>{{ userInfo.guiche }}</h2>
-                          </div>
 
-                          <div class="currenAtCall">
-                              <p>Atendente:</p>
-                              <h1>{{ userInfo.nome }}</h1>
-                          </div>
-                     </div>
+                 <div>
+                   <div>
+                       <div class="componenetInfo" :style="{width: commponenetTimerWidth + 'px'}">
+                         <p>{{ Guiche }}</p>
+                         <h2 v-if="calledInit === true">{{ userInfo.guiche }}</h2>
+                         <h2 v-if="initTimerForCall">{{ formattedTime }}</h2>
+                       </div>
+
+                       <div class="currenAtCall">
+                         <p>Atendente:</p>
+                         <h1>{{ userInfo.nome }}</h1>
+                       </div>
+                   </div>
+                 </div>
 
                      <div class="comOnA">
                                   <h1>Atendimento</h1>
-                        <div>
-                              <div class="onCallingComponenets">
-                                      <div class="callComponenet">
-                                          <div v-for="(onGoing, index) in onCall" :key="index">
-
-                                          </div>
-                                      </div>
-                                      <div class="buttonTets">
-                                      <button>Encerrar</button>
-                                      <button>Pausar</button>
-                                  </div>
-                               </div>
-
+                       <div>
+                                <div class="onCallingComponenets">
+                                        <div class="callComponenet">
+                                          <div class="onCallComponenet" v-for="(onGoing, index) in onCall" :key="index">
+                                                  <h3>Senha</h3>
+                                                  <h1>{{ onGoing.senha }}</h1>
+                                                   <h3>Tipo</h3>
+                                                   <h2>{{ onGoing.info }}</h2>
+                                            </div>
+                                        </div>
+                                        <div class="buttonTets">
+                                        <button>Encerrar</button>
+                                        <button>Pausar</button>
+                                    </div>
+                                 </div>
                                 <div class="elementOfOngoing" v-if="callingOn">
                                         <h1>Chamando</h1>
                                         <div class="callinCurrent">
@@ -97,6 +103,7 @@ import axios from 'axios';
 export default {
     data() {
         return{
+            Guiche: 'Guiche',
             senhas: [],
             userInfo: {
                 nome: '',
@@ -116,10 +123,14 @@ export default {
             time: '',
             currentCallNotAnswerd: true,
             initCurrentCalling: [],
-            onCall: []
+            onCall: [],
+            passedTime: 0,
+            formattedTime: '00:00',
+            initTimerForCall: false,
+            calledInit: true,
+           commponenetTimerWidth: 250
         }
     },
-
 
     watch: {
         senhas: {
@@ -314,7 +325,7 @@ export default {
                 });
 
                 this.calledSenha = response.data.data;
-                this.featchUserOnCalling();
+                await this.featchUserOnCalling();
             } catch (error) {
                 console.log('error', error);
             }
@@ -336,7 +347,8 @@ export default {
 
                     if(this.callingTimer < 30){
                        this.handleTimerdisplayInfo = 'orange';
-                    } 
+                    }
+
                     if( this.callingTimer < 15) {
                         this.handleTimerdisplayInfo = 'red';
                     }
@@ -391,11 +403,10 @@ export default {
                   this.updateTime();
                   let calledTime = this.time;
 
-                  console.log(calledTime, guiche, atendente, senha, info);
-
                   this.initOnGoingCall(guiche, senha, info, atendente, calledTime);
                   setTimeout(() => {
                      this.cancelByInfo(senha, guiche, atendente);
+                     this.getCurrentCall(atendente, senha, guiche);
                   }, 100)
 
 
@@ -413,17 +424,56 @@ export default {
               info: info,
               atendente: atendente,
               callStart: callStart
-
-
-            })
+            });
           } catch (err) {
             console.error(err);
           }
-      }
+      },
+
+      async getCurrentCall(atendente, senha, guiche){
+          console.log("teste", atendente, senha, guiche);
+          try {
+            const response = await axios.get('http://localhost:8080/ongoingCall', {
+                params: {
+                  atendente: atendente,
+                  senha: senha,
+                  guiche: guiche
+                }
+            });
+            this.calledInit = false;
+            if(this.calledInit === false){
+              this.commponenetTimerWidth = 600;
+              this.Guiche = 'Tempo'
+            }
+            this.startCountingOnGoingCall();
+            this.onCall = Array.isArray(response.data.data) ? response.data.data : [response.data.data];
+          } catch (error){
+              console.log("Error fetching data");
+          }
+      },
+
+      startCountingOnGoingCall(){
+          this.interval = setInterval(() => {
+              this.passedTime++;
+              this.updateFormattedTime();
+              this.initTimerForCall = true;
+
+          }, 1000);
+      },
+
+      updateFormattedTime() {
+        const minutes = Math.floor(this.passedTime / 60);
+        const seconds = this.passedTime % 60;
+
+        // Format minutes and seconds to be always two digits
+        this.formattedTime = `${this.padZero(minutes)}:${this.padZero(seconds)}`;
+      },
+
+      padZero(number) {
+        return number.toString().padStart(2, '0');
+      },
 
     },
-
-    
 
     mounted() {
        this.loadUserInfo();
